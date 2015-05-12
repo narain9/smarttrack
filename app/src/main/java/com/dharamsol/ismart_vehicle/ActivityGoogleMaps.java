@@ -230,21 +230,21 @@ public class ActivityGoogleMaps extends FragmentActivity {
             //    super.onPostExecute(data);
 
             try {
-                String dataJSON = data;
-                JSONArray jArray = new JSONArray(dataJSON);
+
+                JSONArray jArray = new JSONArray(data);
 
                 JSONObject json = null;
                 json = jArray.getJSONObject(0);
 
                 Log.e("i=", json.toString());
-                Toast.makeText(getApplicationContext(), "success: "+json.getString("success"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "success: "+json.getInt("success"), Toast.LENGTH_SHORT).show();
                 if(json.getInt("success") == 1){
                     double lat = Double.parseDouble(json.getString("lat"));
                     double lon = Double.parseDouble(json.getString("long"));
                     Moving(lat,lon,json.getString("time_remaining"),json.getString("bus_name"));
                 }
                 else{ // success=0
-                    Toast.makeText(getApplicationContext(), "success: "+json.getString("success"), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "message: "+json.getString("message"), Toast.LENGTH_SHORT).show();
                     StartBtn = !StartBtn;
                     if(!StartBtn){
                         StopHandlerThread();
@@ -252,7 +252,7 @@ public class ActivityGoogleMaps extends FragmentActivity {
                     }
                 }
             } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(),"JSON Exception",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"JSON Bus Just Started..",Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
             catch (Exception e)
@@ -271,8 +271,10 @@ public class ActivityGoogleMaps extends FragmentActivity {
 
         String url = "http://smarttrack.herokuapp.com/share_users/real_coords?busId="+busID+"&lat="+Latitude+"&long="+Longitude;
 
-        Log.d("url=", url);
-
+        Log.d("Post-url=", url);
+        Log.d("busID=", busID);
+        Log.d("lat=", Double.toString(Latitude));
+        Log.d("long=", Double.toString(Longitude));
         new JSONParser().execute(url);
         counter++;
     }
