@@ -62,13 +62,23 @@ public class ActivityAllVehiclesActive extends ActionBarActivity {
         vFind.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                Log.d("vehicle_name", active_vehicles.get(vehicle.getSelectedItemPosition()));
-                Toast.makeText(getApplicationContext(), "vehicleName: " + active_IDS.get(vehicle.getSelectedItemPosition()) + "vehicleID: " + active_IDS.get(vehicle.getSelectedItemPosition()), Toast.LENGTH_SHORT).show();
+                if(!active_vehicles.isEmpty()){
+                    Log.d("vehicle_name", active_vehicles.get(vehicle.getSelectedItemPosition()));
+                    Toast.makeText(getApplicationContext(), "vehicleName: " + active_IDS.get(vehicle.getSelectedItemPosition()) + "vehicleID: " + active_IDS.get(vehicle.getSelectedItemPosition()), Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(ActivityAllVehiclesActive.this,ActivityGoogleMaps.class);
-                intent.putExtra("vehicle_id", active_IDS.get(vehicle.getSelectedItemPosition()));
-                startActivity(intent);
-
+                    Intent intent = new Intent(ActivityAllVehiclesActive.this,ActivityGoogleMaps.class);
+                    intent.putExtra("vehicle_id", active_IDS.get(vehicle.getSelectedItemPosition()));
+                    startActivity(intent);
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Sorry! Right now, No Active Vehicle Found..", Toast.LENGTH_SHORT).show();
+                    try {
+                        String query1 = URLEncoder.encode(vehicleSelected, "utf-8");
+                        new ActiveVehiclesAsyncLoader().execute(LINK_URL1 + "?busName="+query1);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
         });
@@ -103,10 +113,10 @@ public class ActivityAllVehiclesActive extends ActionBarActivity {
             try {
                 String s = "";
                 JSONArray jArray = new JSONArray(data);
-
+                int count=0;
                 for (int i = 0; i < jArray.length(); i++) {
                     JSONObject json = null;
-
+                    count++;
                     json = jArray.getJSONObject(i);
                     // Integer.decode(json.getString("vehicle_id")),
                 //    active_vehicles.add(json.getString("name"));
@@ -114,10 +124,10 @@ public class ActivityAllVehiclesActive extends ActionBarActivity {
                     active_IDS.add(json.getString("id"));
 
                     Log.e("i=", json.toString());
-
-
                 }
-                //    Toast.makeText(getApplicationContext(), "i="+json.toString(), Toast.LENGTH_SHORT).show();
+                if(count == 0){
+                    Toast.makeText(getApplicationContext(), "Sorry! No Active Vehicle Found.", Toast.LENGTH_SHORT).show();
+                }
                 // Creating adapter for spinner
                 ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(ActivityAllVehiclesActive.this, android.R.layout.simple_spinner_dropdown_item, active_vehicles);
 

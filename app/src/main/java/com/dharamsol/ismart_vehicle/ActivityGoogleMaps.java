@@ -56,9 +56,11 @@ public class ActivityGoogleMaps extends FragmentActivity {
 
         busID = intent.getStringExtra("vehicle_id");
         reserveSeat = (Button)findViewById(R.id.btn_reserve);
+        reserveSeat.setText("STOP");
+        StartBtn = false;
 
         myTracker = new GPSTracker(ActivityGoogleMaps.this);
-
+        setUpMapIfNeeded();
         if(myTracker.canGetLocation()){
             Latitude = myTracker.getLatitude();
             Longitude = myTracker.getLongitude();
@@ -69,19 +71,28 @@ public class ActivityGoogleMaps extends FragmentActivity {
             myTracker.showSettingsAlert();
         }
 
-        setUpMapIfNeeded();
-        reserveSeat.setText("Start");
+    //    reserveSeat.setText("Start");
+
+        StartBtn = !StartBtn;
+        if(StartBtn){
+            reserveSeat.setText("STOP");
+            StartHandlerThread();
+        }
+        else{
+            reserveSeat.setText("START");
+            StopHandlerThread();
+        }
 
         reserveSeat.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
                 StartBtn = !StartBtn;
                 if(StartBtn){
-                    reserveSeat.setText("Stop");
+                    reserveSeat.setText("STOP");
                     StartHandlerThread();
                 }
                 else{
-                    reserveSeat.setText("Start");
+                    reserveSeat.setText("START");
                     StopHandlerThread();
                 }
             }
@@ -89,33 +100,33 @@ public class ActivityGoogleMaps extends FragmentActivity {
         });
     }
 
-    public void animateMarker2(final MarkerOptions marker, final LatLng toPosition)
-    {
-        final Handler handler = new Handler();
-        final long start = SystemClock.uptimeMillis();
-        final long duration = 2500;
-
-        final Interpolator interpolator = new BounceInterpolator();
-        marker.visible(true);
-
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                long elapsed = SystemClock.uptimeMillis() - start;
-                float t = Math.max(
-                        1 - interpolator.getInterpolation((float) elapsed
-                                / duration), 0);
-
-                marker.anchor(0.5f, 1.0f + 6 * t);
-                marker.position(toPosition);
-
-                if (t > 0.0) {
-                    // Post again 16ms later.
-                    handler.postDelayed(this, 16);
-                }
-            }
-        });
-    }
+//    public void animateMarker2(final MarkerOptions marker, final LatLng toPosition)
+//    {
+//        final Handler handler = new Handler();
+//        final long start = SystemClock.uptimeMillis();
+//        final long duration = 2500;
+//
+//        final Interpolator interpolator = new BounceInterpolator();
+//        marker.visible(true);
+//
+//        handler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                long elapsed = SystemClock.uptimeMillis() - start;
+//                float t = Math.max(
+//                        1 - interpolator.getInterpolation((float) elapsed
+//                                / duration), 0);
+//
+//                marker.anchor(0.5f, 1.0f + 6 * t);
+//                marker.position(toPosition);
+//
+//                if (t > 0.0) {
+//                    // Post again 16ms later.
+//                    handler.postDelayed(this, 16);
+//                }
+//            }
+//        });
+//    }
      private void StopHandlerThread(){
         Toast.makeText(getBaseContext(), "Updates Stopped!", Toast.LENGTH_LONG).show();
         mMap.clear();
@@ -143,9 +154,9 @@ public class ActivityGoogleMaps extends FragmentActivity {
         }).start();
     }
 
-    public void Moving(double lat, double lon,String time, String bName) {
+    public void Moving(double lat, double lon,double time, String bName) {
         Log.d("moving","moving ."+counter);
-        Toast.makeText(getApplicationContext(), "Remaining Time:"+time+" , BusName: "+bName, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Remaining Time: (min,max)=("+(time-5)+" to "+(time+5)+") mins , BusName: "+bName, Toast.LENGTH_SHORT).show();
         final CameraPosition EE_Dept =
                 new CameraPosition.Builder().target(new LatLng(lat, lon))
                         .zoom(10) //mMap.getMaxZoomLevel()-1.5f
@@ -175,13 +186,13 @@ public class ActivityGoogleMaps extends FragmentActivity {
             }
         });
     }
-    private void changeCamera(CameraUpdate update,double lat, double lon,String time,String bName, GoogleMap.CancelableCallback callback) {
+    private void changeCamera(CameraUpdate update,double lat, double lon,double time,String bName, GoogleMap.CancelableCallback callback) {
         mMap.clear();
         mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(lat, lon))
-                .snippet("Lat: " + lat + ",Lng: " + lon)
+                .snippet("Remaining Time: "+"(min,max)=("+(time-5)+" to "+(time+5)+") mins")
                 .flat(true)
-                .title("Bus:"+bName+" , Remaining Time: "+time).visible(true)
+                .title("BusName:"+bName).visible(true)
                 ).showInfoWindow();
 
         int duration = 3000;
@@ -241,18 +252,32 @@ public class ActivityGoogleMaps extends FragmentActivity {
                 if(json.getInt("success") == 1){
                     double lat = Double.parseDouble(json.getString("lat"));
                     double lon = Double.parseDouble(json.getString("long"));
-                    Moving(lat,lon,json.getString("time_remaining"),json.getString("bus_name"));
+                    double bTime = json.getDouble("time_remaining");
+//                    if(bTime.contains("-")){
+//                        bTime.replace("-","");
+//                    }
+//                    int max = Integer.parseInt(bTime) + 5;
+//                    int min = Integer.parseInt(bTime) - 5;
+//                    bTime = "(min,max)=("+String.valueOf(min) + "," + String.valueOf(max)+") minutes";
+                    if(bTime < 0.0){bTime = bTime*-1;}
+                   // "("++") minutes";
+                    Moving(lat,lon,(bTime/60),json.getString("bus_name"));
                 }
                 else{ // success=0
                     Toast.makeText(getApplicationContext(), "message: "+json.getString("message"), Toast.LENGTH_SHORT).show();
-                    StartBtn = !StartBtn;
-                    if(!StartBtn){
-                        StopHandlerThread();
-                        reserveSeat.setText("Start");
-                    }
+                    mMap.clear();
+                    setUpMap();
+//
+//          StartBtn = !StartBtn;
+//                    if(!StartBtn){
+//                        StopHandlerThread();
+//                        reserveSeat.setText("Start");
+//                    }
                 }
             } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(),"JSON Bus Just Started..",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Bus Has Just Started..",Toast.LENGTH_SHORT).show();
+                mMap.clear();
+                setUpMap();
                 e.printStackTrace();
             }
             catch (Exception e)

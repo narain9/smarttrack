@@ -5,6 +5,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="spinner_title">Select Label</string>
-    <string name="title_activity_activity_google_maps">Map</string>
+    <string name="title_activity_activity_google_maps">Google Map</string>
 
 </resources>

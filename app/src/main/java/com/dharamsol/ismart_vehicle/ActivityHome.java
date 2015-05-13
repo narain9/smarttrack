@@ -22,7 +22,7 @@ public class ActivityHome extends ActionBarActivity {
         sharing.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                Intent intent = new Intent(ActivityHome.this,ActivitySharingUser.class);
+                Intent intent = new Intent(ActivityHome.this,ActivityPassengerClick.class);
                 //    intent.putExtra("ID", "1");
                 startActivity(intent);
             }
@@ -32,7 +32,7 @@ public class ActivityHome extends ActionBarActivity {
         querying.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
-                Intent intent = new Intent(ActivityHome.this,ActivityQueryingUser.class);
+                Intent intent = new Intent(ActivityHome.this,ActivitySelectVehicle.class);
                 //    intent.putExtra("ID", "1");
                 startActivity(intent);
             }

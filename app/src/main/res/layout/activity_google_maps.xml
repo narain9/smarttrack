@@ -17,11 +17,11 @@
 
         <Button
             android:id="@+id/btn_reserve"
-            android:layout_width="wrap_content"
+            android:layout_width="194dp"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginTop="16dp"
-            android:text="Reserve Seat"
+            android:text="START"
             android:layout_gravity="right" />
         <fragment
             android:layout_width="match_parent"

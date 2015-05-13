@@ -60,14 +60,17 @@ public class ActivityPassengerClick extends ActionBarActivity {
         submit.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
+              if(vehicleName.getCount()!=0) {
+                    String selected_vehicle = dropdown_vehicles.get(vehicleName.getSelectedItemPosition());
+                    String selected_vehicle_id = vehicleID.getText().toString();
 
-                String selected_vehicle = dropdown_vehicles.get(vehicleName.getSelectedItemPosition());
-                String selected_vehicle_id = vehicleID.getText().toString();
+                    Toast.makeText(getApplicationContext(), "vehicleName=" + selected_vehicle + ",vehicleId=" + selected_vehicle_id, Toast.LENGTH_SHORT).show();
 
-                Toast.makeText(getApplicationContext(), "vehicleName="+selected_vehicle+",vehicleId="+selected_vehicle_id, Toast.LENGTH_SHORT).show();
-
-                new JSONParser().execute(LINK_URL2+"?vehicleId="+selected_vehicle_id+"&vehicleName="+selected_vehicle);
-
+                    new JSONParser().execute(LINK_URL2 + "?vehicleId=" + selected_vehicle_id + "&vehicleName=" + selected_vehicle);
+               }
+                else{
+                  Toast.makeText(getApplicationContext(), "Sorry! No vehicle selected..", Toast.LENGTH_SHORT).show();
+              }
             }
 
         });

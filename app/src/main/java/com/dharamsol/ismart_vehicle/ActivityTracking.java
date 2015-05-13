@@ -28,74 +28,82 @@ import org.json.JSONObject;
 
 public class ActivityTracking extends ActionBarActivity{
 
-    Button track,stop ;
-    RadioGroup timeGroup;
-    RadioButton timeButton;
+    Button start,stop ;
+//    RadioGroup timeGroup;
+//    RadioButton timeButton;
     String USER_ID = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tracking);
-        track = (Button)findViewById(R.id.button3);
-        stop = (Button)findViewById(R.id.button4);
+        setContentView(R.layout.start_stop);
+        start = (Button)findViewById(R.id.start);
+        stop = (Button)findViewById(R.id.stop);
 
     //    track.setBackgroundColor();
     //    stop.setBackgroundColor(0x000);
 
         Intent intent = getIntent();
-
         USER_ID = intent.getStringExtra("user_id");
-    //    USER_ID = "19";
-        track.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                track.setClickable(false);
-                stop.setClickable(true);
-                timeGroup = (RadioGroup) findViewById(R.id.radioGroup);
-                int selectedId = timeGroup.getCheckedRadioButtonId();
-                timeButton = (RadioButton) findViewById(selectedId);
 
+        start.setClickable(false);
+        start.setText("STARTED");
 
-                RadioButton temp1 = (RadioButton) findViewById(R.id.radioButton);
-                RadioButton temp2 = (RadioButton) findViewById(R.id.radioButton2);
-                RadioButton temp3 = (RadioButton) findViewById(R.id.radioButton3);
-
-                if (timeButton.getText() == temp1.getText())
-                {
-                    Intent serviceIntent = new Intent(ActivityTracking.this,myTrackingService.class);
-                    serviceIntent.putExtra("user_id", USER_ID);
-                    serviceIntent.putExtra("minTime" , "15000");
-                    startService(serviceIntent);
-                }
-
-                else if (timeButton.getText() == temp2.getText())
-                {
-                    Intent serviceIntent = new Intent(ActivityTracking.this,myTrackingService.class);
-                    serviceIntent.putExtra("user_id", USER_ID);
-                    serviceIntent.putExtra("minTime" , "30000");
-                    startService(serviceIntent);
-
-                }
-
-                else if (timeButton.getText() == temp3.getText())
-                {
-                    Intent serviceIntent = new Intent(ActivityTracking.this,myTrackingService.class);
-                    serviceIntent.putExtra("user_id", USER_ID);
-                    serviceIntent.putExtra("minTime" , "60000");
-                    startService(serviceIntent);
-
-                }
-            }
-        });
-
+        stop.setClickable(true);
+        Intent serviceIntent = new Intent(ActivityTracking.this,myTrackingService.class);
+        serviceIntent.putExtra("user_id", USER_ID);
+        serviceIntent.putExtra("minTime" , "15000");
+        startService(serviceIntent);
 
         stop.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 stop.setClickable(false);
-                track.setClickable(true);
+                stop.setText("STOPPED");
+             //   start.setClickable(true);
                 stopService(new Intent(ActivityTracking.this, myTrackingService.class));
                 new JSONParser().execute("http://smarttrack.herokuapp.com/share_users/remove/"+USER_ID);
             }
         });
+    //    USER_ID = "19";
+//        start.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                start.setClickable(false);
+//                stop.setClickable(true);
+//                timeGroup = (RadioGroup) findViewById(R.id.radioGroup);
+//                int selectedId = timeGroup.getCheckedRadioButtonId();
+//                timeButton = (RadioButton) findViewById(selectedId);
+//
+//
+//                RadioButton temp1 = (RadioButton) findViewById(R.id.radioButton);
+//                RadioButton temp2 = (RadioButton) findViewById(R.id.radioButton2);
+//                RadioButton temp3 = (RadioButton) findViewById(R.id.radioButton3);
+//
+//                if (timeButton.getText() == temp1.getText())
+//                {
+//                    Intent serviceIntent = new Intent(ActivityTracking.this,myTrackingService.class);
+//                    serviceIntent.putExtra("user_id", USER_ID);
+//                    serviceIntent.putExtra("minTime" , "15000");
+//                    startService(serviceIntent);
+//                }
+//
+//                else if (timeButton.getText() == temp2.getText())
+//                {
+//                    Intent serviceIntent = new Intent(ActivityTracking.this,myTrackingService.class);
+//                    serviceIntent.putExtra("user_id", USER_ID);
+//                    serviceIntent.putExtra("minTime" , "30000");
+//                    startService(serviceIntent);
+//
+//                }
+//
+//                else if (timeButton.getText() == temp3.getText())
+//                {
+//                    Intent serviceIntent = new Intent(ActivityTracking.this,myTrackingService.class);
+//                    serviceIntent.putExtra("user_id", USER_ID);
+//                    serviceIntent.putExtra("minTime" , "60000");
+//                    startService(serviceIntent);
+//
+//                }
+//            }
+//        });
     }
 
     private class JSONParser extends AsyncTask<String,Void,String> {
